@@ -34,6 +34,16 @@
               @foreach($errors->all() as $error)
                 {{ $error }}
               @endforeach
+              @if(Session::has('error'))
+              <p class="alert {{Session::get('alert-class' , 'alert-info')}}">
+                {{Session::get('error')}}
+              </p>
+              @endif
+              @if(Session::has('clave'))
+              <p class="alert {{Session::get('alert-class' , 'alert-info')}}">
+                {{Session::get('clave')}}
+              </p>
+              @endif
               <form action="{{ route('login')}}" method="post">
                 @csrf
               <p class="text-white-50 mb-5">Porfavor ingresa tu correo y contraseña</p>
@@ -46,6 +56,12 @@
               <div class="form-outline form-white mb-4">
                 <label class="form-label" for="typePasswordX">Contraseña</label>
                 <input type="password" minlenght="8" maxlenght="50" name="password" required id="typePasswordX" class="form-control form-control-lg" />
+              </div>
+              <br/>
+
+              <div class="form-outline form-white mb-4">
+                <label class="form-label">Codigo de acceso</label>
+                <input type="text" minlenght="6" maxlenght="6" name="g2fa"  class="form-control form-control-lg" />
               </div>
               <br/>
 

@@ -15,6 +15,9 @@ use Illuminate\Validation\Rules;
 use Illuminate\View\View;
 use App\Rules\Recaptcha;
 use Illuminate\Support\Carbon;
+use PragmaRX\Google2FA\Google2FA;
+use Illuminate\Support\Facades\Crypt;
+
 class RegisteredUserController extends Controller
 {
     /**
@@ -46,17 +49,28 @@ class RegisteredUserController extends Controller
             'email' => $request->email,
             'password' => Hash::make($request->password),
             'admin' => $admin,
+            
         ]);
+
+        $clave = null;
 
         if (!$user->admin) {
             $user->email_verified_at = Carbon::now();
             $user->save();
+            return redirect(RouteServiceProvider::LOGIN);
+        }
+        else{
+            $g2fa = app(Google2FA::class);
+            $clave = $g2fa->generatesecretkey();
+            $seckey = $clave;
+                $encryptkey = Crypt::encryptString($seckey);
+                $user->g2fa = $encryptkey;
+            $user->save();
+            return redirect(RouteServiceProvider::LOGIN)->with('clave', $clave);
         }
 
-        event(new Registered($user));
+        /*event(new Registered($user));
 
-        Auth::login($user);
-
-        return redirect(RouteServiceProvider::HOME);
+       Auth::login($user);*/
     }
 }
